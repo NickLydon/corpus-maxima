@@ -1,0 +1,26 @@
+body {
+    color: #000;
+    font-size:100%;
+    font-family:Tahoma;
+    }
+
+h1 {
+    color: #3e3e3e;
+    font-family:Georgia;
+    font-size:1.6em;
+    border-bottom: 2px #366 solid;
+    }
+
+.menu {
+    background-color: #666;
+    color: #fff;
+    padding: 3px;
+}    
+
+.menu a:link {
+    color: #fff;
+    padding: 3px;
+    font-style: oblique ;
+}  
+
+
