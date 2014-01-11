@@ -9,7 +9,7 @@ function combinations() {
             //This is a local variable called 'x' that represents an array. Variables declared in functions
             //are only visible within the function, i.e. within the two braces ('{' and '}')
             var x = [];
-            console.log(_);
+            
             //Push is an array method that pushes an item into the next available slot
             x.push(initialTerm);
             
