@@ -1,3 +1,7 @@
+var alphabet = function() { return _.map(_.range('a'.charCodeAt(0), 'z'.charCodeAt(0)), function(c) { return String.fromCharCode(c); }); },
+    vowels = function() { return ['a','e','i','o','u']; },
+    consonants = function() { return _.difference(alphabet(), vowels()); };
+
 //Will cause the test to fail if the list of 'terms' does not contain the item 'contains'
 function assertListContainsTerm(terms, contains, initialTerm, overrideError) {
     ok(_.any(terms, function(term) { 
@@ -5,7 +9,7 @@ function assertListContainsTerm(terms, contains, initialTerm, overrideError) {
     }), overrideError || ('When given search term ' + initialTerm + ', the results should include ' + contains));
 }
 
-test('should give user\'s search term first', function() {
+test('should give user\'s search term in list of results', function() {
     var userSearchTerm = 'User\'s initial search',
         target = combinations().all(userSearchTerm);
 
@@ -42,9 +46,8 @@ _.each(['a', 'o', 'e'], function(vowel) {
 
 module('same sounds');
 
-test('uvw', function() {    
-    var uvw = ['u', 'v', 'w'],
-        searchTerms = _.map(uvw, function(x) {
+function sameSoundTests(substitutions) {
+    var searchTerms = _.map(substitutions, function(x) {
             return 'b' + x;  
         }),
         results = _.map(searchTerms, function(term) {
@@ -56,4 +59,63 @@ test('uvw', function() {
            return _.contains(resultSet, term);
        }), term + ' should have been returned when supplying ' + searchTerms); 
     });
+}
+
+test('uvw', function() {  
+    sameSoundTests(['u', 'v', 'w']);
 });
+
+test('i y', function() {
+   sameSoundTests(['i', 'y']);
+});
+
+module('consonants');
+
+function allCombinationsOfVowelsAndConsonants(f) {
+    _.each(vowels(), function(vowel) {
+        _.each(consonants(), function(consonant) {
+            f(vowel, consonant);
+        });
+    });  
+}
+
+function consonantAssertions(testParameters) {
+    allCombinationsOfVowelsAndConsonants(function(vowel, consonant) {
+        var initialTerm = testParameters.initialTerm(vowel, consonant),
+            target = combinations().all(initialTerm);
+        
+        assertListContainsTerm(target, testParameters.expected(vowel, consonant), initialTerm);    
+    });
+}
+
+test('should double consonants when single consonant after short vowel', function() {
+    consonantAssertions({
+       initialTerm: function(vowel, consonant) {
+           return vowel + consonant;
+       },
+       expected: function(vowel, consonant) {
+           return vowel + consonant + consonant;
+       }
+    });
+});
+
+test('should halve consonants when double consonant after short vowel', function() {
+    consonantAssertions({
+       initialTerm: function(vowel, consonant) {
+           return vowel + consonant + consonant;
+       },
+       expected: function(vowel, consonant) {
+           return vowel + consonant;
+       }
+    });
+});
+
+test('should not touch consonants after long vowel', function() {
+    allCombinationsOfVowelsAndConsonants(function(vowel, consonant) {
+        var initialTerm = consonant + vowel + vowel + consonant,
+            target = combinations().all(initialTerm);
+            
+        ok(!_.contains(target, initialTerm + consonant), 'should not have doubled the consonant after the long vowel');
+    });
+});
+
